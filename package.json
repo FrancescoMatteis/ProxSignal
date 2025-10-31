@@ -1,0 +1,44 @@
+{
+	"name": "proxsignal",
+	"version": "0.1.2",
+	"description": "A minimal and lightweight signal library for JavaScript and TypeScript",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"scripts": {
+		"build": "npm run test && rimraf dist && tsc",
+		"build:force": "rimraf dist && tsc",
+		"test": "vitest run --coverage",
+		"test:watch": "vitest",
+		"test:coverage": "vitest run --coverage --coverage.reporter=text --coverage.reporter=text-summary --coverage.reporter=html --coverage.reportsDirectory=./coverage",
+		"clean": "rimraf dist",
+		"clean:all": "rimraf node_modules dist coverage"
+	},
+	"keywords": [
+		"reactive",
+		"signal",
+		"proxy",
+		"synchronous",
+		"javascript",
+		"typescript"
+	],
+	"files": [
+		"dist",
+		"README.md",
+		"LICENSE",
+		"package.json"
+	],
+	"author": "Francisco Matteis",
+	"license": "MIT",
+	"type": "module",
+	"devDependencies": {
+		"@types/node": "^24.9.1",
+		"@vitest/coverage-v8": "^4.0.4",
+		"rimraf": "^6.0.1",
+		"typescript": "^5.9.3",
+		"vitest": "^4.0.3"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/francescomatteis/proxsignal.git"
+	}
+}

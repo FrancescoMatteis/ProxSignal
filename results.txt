@@ -1,0 +1,30 @@
+Array Scheduler - Schedule 1000 signals: 0.52ms
+Array Scheduler - Schedule 10000 signals: 16.29ms
+Array Scheduler - Schedule 100000 signals: 2302.41ms
+Map Scheduler - Schedule 1000 signals: 0.12ms
+Map Scheduler - Schedule 10000 signals: 2.08ms
+Map Scheduler - Schedule 100000 signals: 5.18ms
+Both Scheduler - Schedule 1000 signals: 0.45ms
+Both Scheduler - Schedule 10000 signals: 5.87ms
+Both Scheduler - Schedule 100000 signals: 508.99ms
+
+
+Array Scheduler - Execute 1000 signals: 210.51ms
+Array Scheduler - Execute 10000 signals: 1646.28ms
+Array Scheduler - Execute 100000 signals: 20358.14ms
+Map Scheduler - Execute 1000 signals: 2509.69ms
+Map Scheduler - Execute 10000 signals: 27120.57ms
+Both Scheduler - Execute 1000 signals: 272.44ms
+Both Scheduler - Execute 10000 signals: 1712.37ms
+Both Scheduler - Execute 100000 signals: 20576.52ms
+
+
+Array Scheduler - 1000 duplicate schedules: 0.15ms
+Array Scheduler - 10000 duplicate schedules: 0.38ms
+Array Scheduler - 100000 duplicate schedules: 2.07ms
+Map Scheduler - 1000 duplicate schedules: 0.03ms
+Map Scheduler - 10000 duplicate schedules: 0.36ms
+Map Scheduler - 100000 duplicate schedules: 1.24ms
+Both Scheduler - 1000 duplicate schedules: 0.05ms
+Both Scheduler - 10000 duplicate schedules: 0.32ms
+Both Scheduler - 100000 duplicate schedules: 1.92ms
