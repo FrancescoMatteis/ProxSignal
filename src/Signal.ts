@@ -109,6 +109,7 @@ export class Signal<T = any> {
 	 */
 	onChange(callback: () => void): void {
 		this._effects.add(callback);
+		callback();
 	}
 
 	/**
