@@ -18,14 +18,15 @@ describe("Signal Effects", () => {
 
 			signal.onChange(effect);
 
-			expect(effect).toHaveBeenCalledTimes(0);
+			// Effect is now called immediately on registration
+			expect(effect).toHaveBeenCalledTimes(1);
 
 			signal.v = 2;
 
 			// Wait for microtask
 			await new Promise((resolve) => setTimeout(resolve, 0));
 
-			expect(effect).toHaveBeenCalledTimes(1);
+			expect(effect).toHaveBeenCalledTimes(2);
 		});
 
 		it("should execute effect when signal changes", async () => {
@@ -34,13 +35,16 @@ describe("Signal Effects", () => {
 
 			signal.onChange(effect);
 
+			// Effect is called immediately on registration (1 call)
+			expect(effect).toHaveBeenCalledTimes(1);
+
 			// Change signal
 			signal.v = 2;
 
 			// Wait for effect execution
 			await new Promise((resolve) => setTimeout(resolve, 0));
 
-			expect(effect).toHaveBeenCalledTimes(1);
+			expect(effect).toHaveBeenCalledTimes(2);
 		});
 
 		it("should execute effect only once per change", async () => {
@@ -57,8 +61,8 @@ describe("Signal Effects", () => {
 			// Wait for effect
 			await new Promise((resolve) => setTimeout(resolve, 0));
 
-			// Should have been called: 1 (initial) + 1 (batched) = 2
-			expect(effect).toHaveBeenCalledTimes(1);
+			// Should have been called: 1 (initial registration) + 1 (batched) = 2
+			expect(effect).toHaveBeenCalledTimes(2);
 		});
 
 		it("should execute multiple effects for same signal", async () => {
@@ -75,9 +79,10 @@ describe("Signal Effects", () => {
 
 			await new Promise((resolve) => setTimeout(resolve, 0));
 
-			expect(effect1).toHaveBeenCalledTimes(1);
-			expect(effect2).toHaveBeenCalledTimes(1);
-			expect(effect3).toHaveBeenCalledTimes(1);
+			// Each effect is called once on registration + once on change = 2 times
+			expect(effect1).toHaveBeenCalledTimes(2);
+			expect(effect2).toHaveBeenCalledTimes(2);
+			expect(effect3).toHaveBeenCalledTimes(2);
 		});
 	});
 
@@ -90,17 +95,20 @@ describe("Signal Effects", () => {
 				callOrder.push("effect");
 			});
 
+			// Effect is called immediately on registration
+			expect(callOrder).toEqual(["effect"]);
+
 			callOrder.push("before");
 			signal.v = 2;
 			callOrder.push("after");
 
-			// Before microtask, effect shouldn't be called
-			expect(callOrder).toEqual(["before", "after"]);
+			// Before microtask, the change effect shouldn't be called yet
+			expect(callOrder).toEqual(["effect", "before", "after"]);
 
 			// Wait for microtask
 			await new Promise((resolve) => setTimeout(resolve, 0));
 
-			expect(callOrder).toEqual(["before", "after", "effect"]);
+			expect(callOrder).toEqual(["effect", "before", "after", "effect"]);
 		});
 
 		it("should batch multiple effect executions", async () => {
@@ -117,7 +125,8 @@ describe("Signal Effects", () => {
 			// Should be batched into single microtask
 			await new Promise((resolve) => setTimeout(resolve, 0));
 
-			expect(effect).toHaveBeenCalledTimes(1);
+			// 1 call on registration + 1 batched call = 2
+			expect(effect).toHaveBeenCalledTimes(2);
 		});
 
 		it("should maintain execution order", async () => {
@@ -128,11 +137,15 @@ describe("Signal Effects", () => {
 			signal.onChange(() => executionOrder.push(2));
 			signal.onChange(() => executionOrder.push(3));
 
+			// Effects are called immediately on registration
+			expect(executionOrder).toEqual([1, 2, 3]);
+
 			signal.v = 2;
 
 			await new Promise((resolve) => setTimeout(resolve, 0));
 
-			expect(executionOrder).toEqual([1, 2, 3]);
+			// Then called again on change
+			expect(executionOrder).toEqual([1, 2, 3, 1, 2, 3]);
 		});
 	});
 
@@ -149,7 +162,8 @@ describe("Signal Effects", () => {
 
 			await new Promise((resolve) => setTimeout(resolve, 0));
 
-			expect(effect).toHaveBeenCalledTimes(1);
+			// 1 call on registration + 1 call on change = 2
+			expect(effect).toHaveBeenCalledTimes(2);
 		});
 
 		it("should handle effect that reads multiple signals", async () => {
@@ -164,12 +178,13 @@ describe("Signal Effects", () => {
 			// Change signalA
 			signalA.v = 10;
 			await new Promise((resolve) => setTimeout(resolve, 0));
-			expect(effect).toHaveBeenCalledTimes(1);
+			// 1 call on registration + 1 call on change = 2
+			expect(effect).toHaveBeenCalledTimes(2);
 
 			// Change signalB (doesn't trigger effect)
 			signalB.v = 20;
 			await new Promise((resolve) => setTimeout(resolve, 0));
-			expect(effect).toHaveBeenCalledTimes(1);
+			expect(effect).toHaveBeenCalledTimes(2);
 		});
 
 		it("should re-execute the effect when any computed dependency changes", async () => {
@@ -187,12 +202,13 @@ describe("Signal Effects", () => {
 			// Trigger by changing signalA
 			signalA.v = 42;
 			await new Promise((resolve) => setTimeout(resolve, 0));
-			expect(effect).toHaveBeenCalledTimes(1);
+			// 1 call on registration + 1 call on change = 2
+			expect(effect).toHaveBeenCalledTimes(2);
 
 			// Trigger by changing signalB
 			signalB.v = 100;
 			await new Promise((resolve) => setTimeout(resolve, 0));
-			expect(effect).toHaveBeenCalledTimes(2);
+			expect(effect).toHaveBeenCalledTimes(3);
 		});
 	});
 
@@ -231,6 +247,9 @@ describe("Signal Effects", () => {
 				callCount++;
 			});
 
+			// Each onChange call executes immediately: 3 calls
+			expect(callCount).toBe(3);
+
 			signalA.v = 10;
 			await new Promise((resolve) => setTimeout(resolve, 0));
 
@@ -240,7 +259,8 @@ describe("Signal Effects", () => {
 			signalC.v = 30;
 			await new Promise((resolve) => setTimeout(resolve, 0));
 
-			expect(callCount).toBe(3);
+			// 3 initial calls + 3 change calls = 6 total
+			expect(callCount).toBe(6);
 		});
 	});
 });

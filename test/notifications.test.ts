@@ -165,6 +165,9 @@ describe("Signal Notifications", () => {
 				executionOrder.push("F");
 			});
 
+			// Effects are called immediately on registration, so we need to clear the array
+			executionOrder = [];
+
 			signalE.v;
 			signalF.v;
 
@@ -235,7 +238,7 @@ describe("Signal Notifications", () => {
 	});
 
 	describe("Notification with Effects", () => {
-		it("should notify effects when signal changes", () => {
+		it("should notify effects when signal changes", async () => {
 			const signalA = new Signal(1);
 			let effectCalled = false;
 
@@ -243,10 +246,20 @@ describe("Signal Notifications", () => {
 				effectCalled = true;
 			});
 
+			// Effect is called immediately on registration
+			expect(effectCalled).toBe(true);
+
+			// Reset for the change notification
+			effectCalled = false;
+
 			signalA.v = 2;
 
-			// Effect should be called asynchronously
+			// Effect should be called asynchronously on change
 			expect(effectCalled).toBe(false);
+
+			await new Promise((resolve) => setTimeout(resolve, 0));
+
+			expect(effectCalled).toBe(true);
 		});
 
 		it("should notify multiple effects", async () => {
@@ -261,6 +274,14 @@ describe("Signal Notifications", () => {
 			signalA.onChange(() => {
 				effect2Called = true;
 			});
+
+			// Effects are called immediately on registration
+			expect(effect1Called).toBe(true);
+			expect(effect2Called).toBe(true);
+
+			// Reset for the change notification
+			effect1Called = false;
+			effect2Called = false;
 
 			signalA.v = 2;
 
