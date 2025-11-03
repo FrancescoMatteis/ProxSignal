@@ -1,11 +1,11 @@
 # ProxSignal
 
-![npm version](https://img.shields.io/npm/v/proxsignal)
-![Coverage](https://img.shields.io/codecov/c/github/francescomatteis/proxsignal)
-![npm downloads](https://img.shields.io/npm/dm/proxsignal)
-![npm bundle size](https://img.shields.io/bundlephobia/minzip/proxsignal)
-![License](https://img.shields.io/npm/l/proxsignal)
-![GitHub issues](https://img.shields.io/github/issues/francescomatteis/proxsignal)
+[![npm version](https://img.shields.io/npm/v/proxsignal)](https://www.npmjs.com/package/proxsignal)
+[![Coverage](https://img.shields.io/codecov/c/github/francescomatteis/proxsignal)](https://codecov.io/github/francescomatteis/proxsignal)
+[![npm downloads](https://img.shields.io/npm/dm/proxsignal)](https://www.npmjs.com/package/proxsignal)
+[![npm bundle size](https://img.shields.io/bundlephobia/minzip/proxsignal)](https://bundlephobia.com/package/proxsignal)
+[![License](https://img.shields.io/npm/l/proxsignal)](https://github.com/francescomatteis/proxsignal)
+[![GitHub issues](https://img.shields.io/github/issues/francescomatteis/proxsignal)](https://github.com/francescomatteis/proxsignal/issues)
 
 A minimal and lightweight reactive signal library for JavaScript and TypeScript with automatic dependency tracking and efficient caching.
 
