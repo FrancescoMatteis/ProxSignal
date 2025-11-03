@@ -10,8 +10,7 @@
 		"test": "vitest run --coverage",
 		"test:watch": "vitest",
 		"test:coverage": "vitest run --coverage --coverage.reporter=text --coverage.reporter=text-summary --coverage.reporter=html --coverage.reportsDirectory=./coverage",
-		"clean": "rimraf dist",
-		"clean:all": "rimraf node_modules dist coverage"
+		"clean": "rimraf dist"
 	},
 	"keywords": [
 		"reactive",
