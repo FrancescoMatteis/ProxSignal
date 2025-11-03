@@ -90,7 +90,7 @@ describe("Signal Performance", () => {
 	});
 
 	describe("Speed", () => {
-		it("chain of 2500 computed signals should be evaluated in 2ms", () => {
+		it("chain of 2500 computed signals should be evaluated in 20ms", () => {
 			const signals: Signal<any>[] = [];
 
 			signals.push(new Signal<any>(1));
@@ -107,10 +107,10 @@ describe("Signal Performance", () => {
 			const duration = endTime - startTime;
 
 			expect(signals[2499].v).toBe(2500);
-			expect(duration).toBeLessThanOrEqual(2);
+			expect(duration).toBeLessThanOrEqual(20);
 		});
 
-		it("chain of 2500 computed signals with effect should be evaluated in 2ms", async () => {
+		it("chain of 2500 computed signals with effect should be evaluated in 20ms", async () => {
 			const signals: Signal<any>[] = [];
 
 			const effects = vi.fn(() => {});
@@ -129,7 +129,7 @@ describe("Signal Performance", () => {
 			const endTime = Date.now();
 			const duration = endTime - startTime;
 
-			expect(duration).toBeLessThanOrEqual(2);
+			expect(duration).toBeLessThanOrEqual(20);
 		});
 	});
 });

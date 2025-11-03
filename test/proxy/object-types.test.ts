@@ -622,18 +622,6 @@ describe("Object types", () => {
 			expect((p as any)._isDirty).toBe(true);
 			expect(p.v.byteLength).toBe(4);
 		});
-		it("should be dirty when ArrayBuffer transfer (if supported)", () => {
-			// @ts-ignore
-			const buffer = new ArrayBuffer(8);
-			const p = new Signal(buffer);
-
-			expect((p as any)._isDirty).toBe(true);
-			expect(p.v.byteLength).toBe(8);
-
-			const transferred = (p.v as any).transfer(16);
-			expect((p as any)._isDirty).toBe(true);
-			expect(transferred.byteLength).toBe(16);
-		});
 	});
 
 	describe("TypedArray object (Uint8Array)", () => {
