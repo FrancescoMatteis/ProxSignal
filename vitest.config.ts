@@ -5,7 +5,7 @@ export default defineConfig({
 		globals: true,
 		coverage: {
 			provider: "v8",
-			reporter: ["text", "text-summary"], // Show detailed report and summary in command line only (no directory created)
+			reporter: ["text", "text-summary", "lcov"], // Show detailed report and summary in command line, lcov for Codecov
 			include: ["src/**/*.ts"], // Include all TypeScript files for coverage
 			thresholds: {
 				statements: 100,
