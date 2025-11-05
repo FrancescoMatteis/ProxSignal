@@ -22,6 +22,7 @@ export class Signal<T = any> {
 	 */
 	constructor(value: T) {
 		this._proxy = creaProxy({ v: value }, this.notify.bind(this));
+		this.v;
 	}
 
 	/**
@@ -109,7 +110,6 @@ export class Signal<T = any> {
 	 */
 	onChange(callback: () => void): void {
 		this._effects.add(callback);
-		callback();
 	}
 
 	/**

@@ -40,7 +40,7 @@ describe("Signal Dependency Tracking", () => {
 			const signalB = new Signal(() => signalA.v * 2);
 
 			expect((signalA as any)._depth).toBe(0);
-			expect((signalB as any)._depth).toBe(0);
+			expect((signalB as any)._depth).toBe(1);
 
 			signalB.v;
 

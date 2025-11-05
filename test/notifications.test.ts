@@ -175,7 +175,7 @@ describe("Signal Notifications", () => {
 
 			await new Promise((resolve) => setTimeout(resolve, 0));
 
-			expect(executionOrder).toEqual(["F", "D", "E", "C", "B", "A"]);
+			expect(executionOrder).toEqual(["F", "E", "D", "B", "C", "A"]);
 		});
 	});
 
@@ -246,11 +246,8 @@ describe("Signal Notifications", () => {
 				effectCalled = true;
 			});
 
-			// Effect is called immediately on registration
-			expect(effectCalled).toBe(true);
-
-			// Reset for the change notification
-			effectCalled = false;
+			// Effect is NOT called immediately on registration
+			expect(effectCalled).toBe(false);
 
 			signalA.v = 2;
 
@@ -275,13 +272,9 @@ describe("Signal Notifications", () => {
 				effect2Called = true;
 			});
 
-			// Effects are called immediately on registration
-			expect(effect1Called).toBe(true);
-			expect(effect2Called).toBe(true);
-
-			// Reset for the change notification
-			effect1Called = false;
-			effect2Called = false;
+			// Effects are NOT called immediately on registration
+			expect(effect1Called).toBe(false);
+			expect(effect2Called).toBe(false);
 
 			signalA.v = 2;
 

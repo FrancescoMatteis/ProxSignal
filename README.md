@@ -173,6 +173,26 @@ last.v = "Y";
 // logFull() runs only once after both have changed (not twice)
 ```
 
+### Effect Loop Prevention (Weird Behavior)
+
+Effects cannot create infinite loops. If an effect modifies a signal that would trigger itself again, the loop is prevented. This may seem unexpected, but it's intentional behavior:
+
+```typescript
+import { Signal } from "proxsignal";
+
+const signal = new Signal(0);
+const computed = new Signal(() => signal.v * 2);
+
+computed.onChange(() => {
+	console.log("EFFECT CALLED");
+	signal.v++;
+});
+
+signal.v = 1; // Effect runs once, but modifying signal.v inside the effect doesn't trigger it again
+```
+
+This is intentional behavior to prevent infinite loops when effects modify their own dependencies.
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.

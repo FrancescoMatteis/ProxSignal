@@ -451,7 +451,8 @@ describe("Object types", () => {
 			const p = new Signal(function () {
 				return "old";
 			});
-			expect((p as any)._isDirty).toBe(true);
+			// Signal is accessed during construction via this.v, so it's clean after construction
+			expect((p as any)._isDirty).toBe(false);
 			expect(p.v).toBe("old");
 		});
 	});
@@ -579,7 +580,8 @@ describe("Object types", () => {
 					[object2, 22],
 				])
 			);
-			expect((p as any)._isDirty).toBe(true);
+			// Signal is accessed during construction via this.v, so it's clean after construction
+			expect((p as any)._isDirty).toBe(false);
 			expect(p.v.get(object1)).toBe(11);
 		});
 		it("should NOT be dirty when WeakMap has (non-mutating)", () => {
@@ -614,7 +616,8 @@ describe("Object types", () => {
 			const buffer = new ArrayBuffer(8, { maxByteLength: 16 });
 			const p = new Signal(buffer);
 
-			expect((p as any)._isDirty).toBe(true);
+			// Signal is accessed during construction via this.v, so it's clean after construction
+			expect((p as any)._isDirty).toBe(false);
 			expect(p.v.byteLength).toBe(8);
 
 			(p.v as any).resize(4);
