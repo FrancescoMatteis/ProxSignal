@@ -75,8 +75,8 @@ describe("Signal Edge Cases", () => {
 				effectCount++;
 			});
 
-			// Effect is called immediately on registration (1 call)
-			expect(effectCount).toBe(1);
+			// Effect is NOT called immediately on registration
+			expect(effectCount).toBe(0);
 
 			for (let i = 0; i < 10; i++) {
 				signal.v = i;
@@ -84,8 +84,8 @@ describe("Signal Edge Cases", () => {
 
 			await new Promise((resolve) => setTimeout(resolve, 0));
 
-			// 1 initial call + 1 batched call = 2 total
-			expect(effectCount).toBe(2);
+			// 1 batched call = 1 total
+			expect(effectCount).toBe(1);
 		});
 	});
 
