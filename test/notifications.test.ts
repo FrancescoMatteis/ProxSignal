@@ -175,7 +175,7 @@ describe("Signal Notifications", () => {
 
 			await new Promise((resolve) => setTimeout(resolve, 0));
 
-			expect(executionOrder).toEqual(["F", "D", "E", "C", "B", "A"]);
+			expect(executionOrder).toEqual(["F", "E", "D", "B", "C", "A"]);
 		});
 	});
 

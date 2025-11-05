@@ -4,8 +4,11 @@ import { Signal } from "../src";
 describe("Signal Edge Cases", () => {
 	describe("Circular Dependencies", () => {
 		it("should throw error for A → B → A cycles", () => {
-			const signalA = new Signal<any>(() => signalB.v + 1);
-			const signalB = new Signal<any>(() => signalA.v + 1);
+			const signalA = new Signal<any>(1);
+			const signalB = new Signal<any>(2);
+
+			signalA.v = () => signalB.v + 1;
+			signalB.v = () => signalA.v + 1;
 
 			expect(() => {
 				signalA.v;
@@ -13,9 +16,13 @@ describe("Signal Edge Cases", () => {
 		});
 
 		it("should throw error for A → B → C → A cycles", () => {
-			const signalA = new Signal<any>(() => signalC.v + 1);
-			const signalB = new Signal<any>(() => signalA.v + 1);
-			const signalC = new Signal<any>(() => signalB.v + 1);
+			const signalA = new Signal<any>(1);
+			const signalB = new Signal<any>(2);
+			const signalC = new Signal<any>(3);
+
+			signalA.v = () => signalC.v + 1;
+			signalB.v = () => signalA.v + 1;
+			signalC.v = () => signalB.v + 1;
 
 			expect(() => {
 				signalA.v;

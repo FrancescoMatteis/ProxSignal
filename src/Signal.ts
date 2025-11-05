@@ -22,6 +22,7 @@ export class Signal<T = any> {
 	 */
 	constructor(value: T) {
 		this._proxy = creaProxy({ v: value }, this.notify.bind(this));
+		this.v;
 	}
 
 	/**

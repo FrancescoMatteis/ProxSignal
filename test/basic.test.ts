@@ -16,9 +16,9 @@ describe("Signal Basic Behavior", () => {
 			expect(value1).toBe("hello");
 		});
 
-		it("should be dirty initially", () => {
+		it("should NOT be dirty initially", () => {
 			const signal = new Signal(100);
-			expect((signal as any)._isDirty).toBe(true);
+			expect((signal as any)._isDirty).toBe(false);
 		});
 
 		it("should have empty listeners set", () => {
@@ -45,7 +45,7 @@ describe("Signal Basic Behavior", () => {
 	describe("Getter Behavior", () => {
 		it("should return cached value when clean", () => {
 			const signal = new Signal(5);
-			expect((signal as any)._cacheValue).toBeNull();
+			expect((signal as any)._cacheValue).toBe(5);
 			const firstRead = signal.v;
 			expect((signal as any)._cacheValue).toBe(5);
 			const secondRead = signal.v;
