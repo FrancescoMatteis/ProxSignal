@@ -151,4 +151,34 @@ describe("Signal Basic Behavior", () => {
 			expect(effectCalled).toBe(true);
 		});
 	});
+
+	describe("Mutating Method Behavior", () => {
+		it("should NOT mark as dirty when accessing mutating method", () => {
+			const s = new Signal(new Set([1, 2]));
+			expect((s as any)._isDirty).toBe(false);
+
+			// Accessing the method should not trigger notification
+			const add = s.v.add;
+			expect((s as any)._isDirty).toBe(false);
+		});
+
+		it("should mark as dirty when calling mutating method", () => {
+			const s = new Signal(new Set([1, 2]));
+			expect((s as any)._isDirty).toBe(false);
+
+			// Accessing the method should not trigger notification
+			const add = s.v.add;
+			expect((s as any)._isDirty).toBe(false);
+
+			// Calling the method should trigger notification
+			add(3);
+			expect((s as any)._isDirty).toBe(true);
+			expect(s.v.has(3)).toBe(true);
+
+			// Reading the value should mark as clean
+			const value = s.v;
+			expect((s as any)._isDirty).toBe(false);
+			expect(value.has(3)).toBe(true);
+		});
+	});
 });
