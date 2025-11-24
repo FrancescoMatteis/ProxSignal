@@ -1,6 +1,10 @@
 import { describe, it, expect } from "vitest";
 import { Signal } from "../src";
 
+function hasInWeakRefArray<T extends object>(arr: WeakRef<T>[], item: T): boolean {
+	return arr.some((ref) => ref.deref() === item);
+}
+
 describe("Signal Dependency Tracking", () => {
 	describe("Basic Dependency", () => {
 		it("should track when reading signal B from signal A's getter", () => {
@@ -11,8 +15,8 @@ describe("Signal Dependency Tracking", () => {
 			signalB.v;
 
 			// Verify dependency relationship
-			expect((signalA as any)._listeners.has(signalB)).toBe(true);
-			expect((signalB as any)._sources.has(signalA)).toBe(true);
+			expect(hasInWeakRefArray((signalA as any)._listeners, signalB)).toBe(true);
+			expect(hasInWeakRefArray((signalB as any)._sources, signalA)).toBe(true);
 		});
 
 		it("should add B as listener of A", () => {
@@ -21,8 +25,8 @@ describe("Signal Dependency Tracking", () => {
 
 			signalB.v;
 
-			expect((signalA as any)._listeners.has(signalB)).toBe(true);
-			expect((signalA as any)._listeners.size).toBe(1);
+			expect(hasInWeakRefArray((signalA as any)._listeners, signalB)).toBe(true);
+			expect((signalA as any)._listeners.length).toBe(1);
 		});
 
 		it("should add A as source of B", () => {
@@ -31,8 +35,8 @@ describe("Signal Dependency Tracking", () => {
 
 			signalB.v;
 
-			expect((signalB as any)._sources.has(signalA)).toBe(true);
-			expect((signalB as any)._sources.size).toBe(1);
+			expect(hasInWeakRefArray((signalB as any)._sources, signalA)).toBe(true);
+			expect((signalB as any)._sources.length).toBe(1);
 		});
 
 		it("should update depth when signals depend on each other", () => {
@@ -59,12 +63,12 @@ describe("Signal Dependency Tracking", () => {
 			signalC.v;
 
 			// C depends on B
-			expect((signalB as any)._listeners.has(signalC)).toBe(true);
-			expect((signalC as any)._sources.has(signalB)).toBe(true);
+			expect(hasInWeakRefArray((signalB as any)._listeners, signalC)).toBe(true);
+			expect(hasInWeakRefArray((signalC as any)._sources, signalB)).toBe(true);
 
 			// B depends on A
-			expect((signalA as any)._listeners.has(signalB)).toBe(true);
-			expect((signalB as any)._sources.has(signalA)).toBe(true);
+			expect(hasInWeakRefArray((signalA as any)._listeners, signalB)).toBe(true);
+			expect(hasInWeakRefArray((signalB as any)._sources, signalA)).toBe(true);
 
 			// Depth chain: A(0) -> B(1) -> C(2)
 			expect((signalA as any)._depth).toBe(0);
@@ -81,9 +85,9 @@ describe("Signal Dependency Tracking", () => {
 
 			signalC.v;
 
-			expect((signalC as any)._sources.size).toBe(2);
-			expect((signalC as any)._sources.has(signalA)).toBe(true);
-			expect((signalC as any)._sources.has(signalB)).toBe(true);
+			expect((signalC as any)._sources.length).toBe(2);
+			expect(hasInWeakRefArray((signalC as any)._sources, signalA)).toBe(true);
+			expect(hasInWeakRefArray((signalC as any)._sources, signalB)).toBe(true);
 		});
 
 		it("should have correct depth with multiple dependencies", () => {
@@ -112,11 +116,11 @@ describe("Signal Dependency Tracking", () => {
 			signalC.v;
 
 			// Verify the chain
-			expect((signalA as any)._listeners.has(signalB)).toBe(true);
-			expect((signalB as any)._listeners.has(signalC)).toBe(true);
+			expect(hasInWeakRefArray((signalA as any)._listeners, signalB)).toBe(true);
+			expect(hasInWeakRefArray((signalB as any)._listeners, signalC)).toBe(true);
 
-			expect((signalB as any)._sources.has(signalA)).toBe(true);
-			expect((signalC as any)._sources.has(signalB)).toBe(true);
+			expect(hasInWeakRefArray((signalB as any)._sources, signalA)).toBe(true);
+			expect(hasInWeakRefArray((signalC as any)._sources, signalB)).toBe(true);
 
 			// Verify depths
 			expect((signalA as any)._depth).toBe(0);
@@ -131,13 +135,13 @@ describe("Signal Dependency Tracking", () => {
 			const signalB = new Signal<any>(() => signalA.v * 2);
 
 			signalB.v;
-			expect((signalB as any)._sources.size).toBe(1);
+			expect((signalB as any)._sources.length).toBe(1);
 
 			// Change signalB's value
 			signalB.v = 100;
 
 			// Sources should be cleared
-			expect((signalB as any)._sources.size).toBe(0);
+			expect((signalB as any)._sources.length).toBe(0);
 		});
 
 		it("should notify sources to remove listener", () => {
@@ -145,13 +149,13 @@ describe("Signal Dependency Tracking", () => {
 			const signalB = new Signal<any>(() => signalA.v * 2);
 
 			signalB.v;
-			expect((signalA as any)._listeners.has(signalB)).toBe(true);
+			expect(hasInWeakRefArray((signalA as any)._listeners, signalB)).toBe(true);
 
 			// Change signalB's value
 			signalB.v = 100;
 
 			// signalA should no longer have signalB as listener
-			expect((signalA as any)._listeners.has(signalB)).toBe(false);
+			expect(hasInWeakRefArray((signalA as any)._listeners, signalB)).toBe(false);
 		});
 
 		it("should clear sources set after cleanup", () => {
@@ -160,10 +164,10 @@ describe("Signal Dependency Tracking", () => {
 			const signalC = new Signal<any>(() => signalA.v + signalB.v);
 
 			signalC.v;
-			expect((signalC as any)._sources.size).toBe(2);
+			expect((signalC as any)._sources.length).toBe(2);
 
 			signalC.v = 50;
-			expect((signalC as any)._sources.size).toBe(0);
+			expect((signalC as any)._sources.length).toBe(0);
 		});
 
 		it("should rebuild dependencies on re-computation", () => {
@@ -172,11 +176,11 @@ describe("Signal Dependency Tracking", () => {
 
 			// Initial computation
 			signalB.v;
-			expect((signalB as any)._sources.size).toBe(1);
+			expect((signalB as any)._sources.length).toBe(1);
 
 			// Change to a direct value (removes dependencies)
 			signalB.v = 100;
-			expect((signalB as any)._sources.size).toBe(0);
+			expect((signalB as any)._sources.length).toBe(0);
 
 			// Reset signalA for fresh start
 			signalA.v = 2;
@@ -185,7 +189,7 @@ describe("Signal Dependency Tracking", () => {
 			signalB.v = () => signalA.v * 3;
 			const value = signalB.v;
 			expect(value).toBe(6);
-			expect((signalB as any)._sources.size).toBe(1);
+			expect((signalB as any)._sources.length).toBe(1);
 		});
 	});
 
@@ -207,8 +211,8 @@ describe("Signal Dependency Tracking", () => {
 			signalC.v;
 
 			// Verify dependencies
-			expect((signalA as any)._listeners.has(signalB)).toBe(true);
-			expect((signalB as any)._listeners.has(signalC)).toBe(true);
+			expect(hasInWeakRefArray((signalA as any)._listeners, signalB)).toBe(true);
+			expect(hasInWeakRefArray((signalB as any)._listeners, signalC)).toBe(true);
 
 			// Change signalA to depend on signalC, creating A -> B -> C -> A cycle
 			signalA.v = () => signalC.v + 1;
