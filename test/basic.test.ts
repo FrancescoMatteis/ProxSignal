@@ -23,12 +23,12 @@ describe("Signal Basic Behavior", () => {
 
 		it("should have empty listeners set", () => {
 			const signal = new Signal(1);
-			expect((signal as any)._listeners.size).toBe(0);
+			expect((signal as any)._listeners.length).toBe(0);
 		});
 
 		it("should have empty sources set", () => {
 			const signal = new Signal(1);
-			expect((signal as any)._sources.size).toBe(0);
+			expect((signal as any)._sources.length).toBe(0);
 		});
 
 		it("should have empty effects set", () => {
@@ -55,9 +55,9 @@ describe("Signal Basic Behavior", () => {
 
 		it("should not trigger notification when reading clean value", () => {
 			const signal = new Signal(10);
-			const listenersBefore = (signal as any)._listeners.size;
+			const listenersBefore = (signal as any)._listeners.length;
 			signal.v; // Read
-			const listenersAfter = (signal as any)._listeners.size;
+			const listenersAfter = (signal as any)._listeners.length;
 			expect(listenersAfter).toBe(listenersBefore);
 		});
 

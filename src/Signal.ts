@@ -9,8 +9,8 @@ import { EffectScheduler } from "./EffectScheduler.js";
  */
 export class Signal<T = any> {
 	private _proxy: any;
-	private _listeners: Set<Signal<any>> = new Set();
-	private _sources: Set<Signal<any>> = new Set();
+	private _listeners: WeakRef<Signal<any>>[] = [];
+	private _sources: WeakRef<Signal<any>>[] = [];
 	private _effects: Set<() => void> = new Set();
 	private _depth: number = 0;
 	private _isDirty: boolean = true;
@@ -36,13 +36,33 @@ export class Signal<T = any> {
 	}
 
 	/**
+	 * Checks if a listener exists in the listeners refs array.
+	 */
+	private _hasListener(listener: Signal<any>): boolean {
+		return this._listeners.some((ref) => ref.deref() === listener);
+	}
+
+	/**
+	 * Checks if a source exists in the sources refs array.
+	 */
+	private _hasSource(source: Signal<any>): boolean {
+		return this._sources.some((ref) => ref.deref() === source);
+	}
+
+	/**
 	 * Notifies all listener signals of changes and executes effects.
 	 */
 	private notifyListeners(): void {
 		const scheduler = new NotificationScheduler();
-		for (const listener of this._listeners) {
-			scheduler.scheduleSignal(listener);
-		}
+
+		this._listeners = this._listeners.filter((ref) => {
+			const listener = ref.deref();
+			if (listener) {
+				scheduler.scheduleSignal(listener);
+				return true;
+			}
+			return false;
+		});
 		scheduler.execute();
 		this.notifyEffects();
 	}
@@ -72,7 +92,9 @@ export class Signal<T = any> {
 	 * @param listener - The signal to notify when this signal changes.
 	 */
 	addListener(listener: Signal<any>): void {
-		this._listeners.add(listener);
+		if (!this._hasListener(listener)) {
+			this._listeners.push(new WeakRef(listener));
+		}
 	}
 
 	/**
@@ -80,7 +102,7 @@ export class Signal<T = any> {
 	 * @param listener - The signal to stop notifying.
 	 */
 	removeListener(listener: Signal<any>): void {
-		this._listeners.delete(listener);
+		this._listeners = this._listeners.filter((ref) => ref.deref() !== listener);
 	}
 
 	/**
@@ -89,7 +111,9 @@ export class Signal<T = any> {
 	 * @param source - The source signal this signal depends on.
 	 */
 	addSource(source: Signal<any>): void {
-		this._sources.add(source);
+		if (!this._hasSource(source)) {
+			this._sources.push(new WeakRef(source));
+		}
 		this._depth = Math.max(this._depth, source._depth + 1);
 	}
 
@@ -97,10 +121,13 @@ export class Signal<T = any> {
 	 * Removes all source signals and resets the depth.
 	 */
 	removeAllSources(): void {
-		for (const source of this._sources) {
-			source.removeListener(this);
+		for (const ref of this._sources) {
+			const source = ref.deref();
+			if (source) {
+				source.removeListener(this);
+			}
 		}
-		this._sources.clear();
+		this._sources = [];
 		this._depth = 0;
 	}
 

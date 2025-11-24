@@ -1,6 +1,10 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { Signal } from "../src";
 
+function hasInWeakRefArray<T extends object>(arr: WeakRef<T>[], item: T): boolean {
+	return arr.some((ref) => ref.deref() === item);
+}
+
 describe("Signal Management", () => {
 	describe("Listener Management", () => {
 		it("should handle duplicate listener additions", () => {
@@ -10,7 +14,7 @@ describe("Signal Management", () => {
 			signalA.addListener(signalB);
 			signalA.addListener(signalB);
 
-			expect((signalA as any)._listeners.size).toBe(1);
+			expect((signalA as any)._listeners.length).toBe(1);
 		});
 	});
 
@@ -52,7 +56,7 @@ describe("Signal Management", () => {
 
 			signalB.removeAllSources();
 
-			expect((signalB as any)._sources.size).toBe(0);
+			expect((signalB as any)._sources.length).toBe(0);
 		});
 
 		it("should track sources in set", () => {
@@ -63,9 +67,9 @@ describe("Signal Management", () => {
 			signalB.addSource(signalA);
 			signalB.addSource(signalC);
 
-			expect((signalB as any)._sources.size).toBe(2);
-			expect((signalB as any)._sources.has(signalA)).toBe(true);
-			expect((signalB as any)._sources.has(signalC)).toBe(true);
+			expect((signalB as any)._sources.length).toBe(2);
+			expect(hasInWeakRefArray((signalB as any)._sources, signalA)).toBe(true);
+			expect(hasInWeakRefArray((signalB as any)._sources, signalC)).toBe(true);
 		});
 	});
 
@@ -77,8 +81,8 @@ describe("Signal Management", () => {
 			signalA.addListener(signalB);
 			signalB.addSource(signalA);
 
-			expect((signalA as any)._listeners.has(signalB)).toBe(true);
-			expect((signalB as any)._sources.has(signalA)).toBe(true);
+			expect(hasInWeakRefArray((signalA as any)._listeners, signalB)).toBe(true);
+			expect(hasInWeakRefArray((signalB as any)._sources, signalA)).toBe(true);
 		});
 
 		it("should clean up relationships properly", () => {
@@ -90,8 +94,8 @@ describe("Signal Management", () => {
 
 			signalB.removeAllSources();
 
-			expect((signalB as any)._sources.size).toBe(0);
-			expect((signalA as any)._listeners.has(signalB)).toBe(false);
+			expect((signalB as any)._sources.length).toBe(0);
+			expect(hasInWeakRefArray((signalA as any)._listeners, signalB)).toBe(false);
 		});
 
 		it("should handle complex dependency graphs", () => {
@@ -108,10 +112,10 @@ describe("Signal Management", () => {
 			signalA.addListener(signalD);
 			signalD.addSource(signalA);
 
-			expect((signalA as any)._listeners.size).toBe(2);
-			expect((signalB as any)._sources.size).toBe(1);
-			expect((signalC as any)._sources.size).toBe(1);
-			expect((signalD as any)._sources.size).toBe(1);
+			expect((signalA as any)._listeners.length).toBe(2);
+			expect((signalB as any)._sources.length).toBe(1);
+			expect((signalC as any)._sources.length).toBe(1);
+			expect((signalD as any)._sources.length).toBe(1);
 		});
 
 		it("should update depth correctly in dependency chain", () => {

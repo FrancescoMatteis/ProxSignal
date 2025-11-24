@@ -1,6 +1,10 @@
 import { describe, it, expect } from "vitest";
 import { Signal, SignalStack, NotificationScheduler, EffectScheduler } from "../src";
 
+function hasInWeakRefArray<T extends object>(arr: WeakRef<T>[], item: T): boolean {
+	return arr.some((ref) => ref.deref() === item);
+}
+
 describe("Signal Integration", () => {
 	describe("SignalStack Integration", () => {
 		it("should push to stack when computing", () => {
@@ -44,8 +48,8 @@ describe("Signal Integration", () => {
 
 			signalB.v;
 
-			expect((signalB as any)._sources.has(signalA)).toBe(true);
-			expect((signalA as any)._listeners.has(signalB)).toBe(true);
+			expect(hasInWeakRefArray((signalB as any)._sources, signalA)).toBe(true);
+			expect(hasInWeakRefArray((signalA as any)._listeners, signalB)).toBe(true);
 		});
 	});
 
