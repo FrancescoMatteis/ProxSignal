@@ -40,10 +40,14 @@ export function creaProxy<T extends Record<string, any>>(obj: T, notifyFunction:
 				typeof target[prop as keyof typeof target] === "function" &&
 				(target instanceof Set || target instanceof WeakSet || target instanceof Map || target instanceof WeakMap || target instanceof Date)
 			) {
+				const originalMethod = target[prop as keyof typeof target] as Function;
 				if (MUTATING_COLLECTION_METHODS.has(prop as string)) {
-					notifyFunction();
+					return function (this: any, ...args: any[]) {
+						notifyFunction();
+						return originalMethod.apply(target, args);
+					};
 				}
-				return (target[prop as keyof typeof target] as Function).bind(target);
+				return originalMethod.bind(target);
 			}
 
 			if ((target instanceof Promise || target instanceof RegExp) && typeof target[prop as keyof typeof target] === "function") {
@@ -62,10 +66,14 @@ export function creaProxy<T extends Record<string, any>>(obj: T, notifyFunction:
 					target instanceof Float64Array) &&
 				typeof target[prop as keyof typeof target] === "function"
 			) {
+				const originalMethod = target[prop as keyof typeof target] as Function;
 				if (MUTATING_ARRAY_BUFFER_METHODS.has(prop as string)) {
-					notifyFunction();
+					return function (this: any, ...args: any[]) {
+						notifyFunction();
+						return originalMethod.apply(target, args);
+					};
 				}
-				return (target[prop as keyof typeof target] as Function).bind(target);
+				return originalMethod.bind(target);
 			}
 
 			return Reflect.get(target, prop);
